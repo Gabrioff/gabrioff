@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkSong - Studio</title>
+    
+    <link rel="icon" href="https://i.postimg.cc/rpn123gJ/Diseno-sin-titulo-(23).png" type="image/png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Outfit', sans-serif; 
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        .bg-gradient-dark { background: radial-gradient(circle at 50% 0%, #1a0b2e 0%, #050505 70%); }
+        .glass-card {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .glass-card-hover:hover {
+            background: rgba(30, 30, 40, 0.8);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -5px rgba(139, 92, 246, 0.15);
+        }
+        .neon-text-purple { text-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
+        .neon-border:focus-within { box-shadow: 0 0 30px rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.5); }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } }
+        .animate-pulse-glow { animation: pulse-glow 3s infinite; }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .audio-bar {
+            width: 4px;
+            background: #a855f7;
+            border-radius: 2px;
+            animation: audio-wave 0.5s ease-in-out infinite;
+        }
+        @keyframes audio-wave { 0%, 100% { height: 20%; } 50% { height: 80%; } }
+        .audio-bar:nth-child(2) { animation-delay: 0.1s; }
+        .audio-bar:nth-child(3) { animation-delay: 0.2s; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Utilidades ---
+        const formatDuration = (seconds) => {
+            if (!seconds && seconds !== 0) return '';
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            const pad = (num) => num.toString().padStart(2, '0');
+            
+            if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
+            return `${m}:${pad(s)}`;
+        };
+
+        const getYoutubeId = (url) => {
+            if (!url) return null;
+            // Regex robusto para ID de YouTube
+            const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
+            return (match && match[2].length === 11) ? match[2] : null;
+        };
+
+        const getThumbnail = (video) => {
+            // El servidor ahora debería devolver links estables de img.youtube.com
+            // Pero por seguridad hacemos fallback aquí también
+            if (video.thumbnail && !video.thumbnail.includes('None') && !video.thumbnail.includes('googleusercontent')) return video.thumbnail;
+            
+            // Construirla manualmente si el server falló o mandó una url temporal
+            const id = video.id || getYoutubeId(video.webpage_url || video.url);
+            if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+            
+            // Fallback final
+            return "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?q=80&w=1000&auto=format&fit=crop";
+        };
+
+        // --- Iconos ---
+        const Icon = ({ children, className, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>
+        );
+        const SearchIcon = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></Icon>;
+        const MusicIcon = (p) => <Icon {...p}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></Icon>;
+        const VideoIcon = (p) => <Icon {...p}><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2" ry="2"/></Icon>;
+        const DownloadIcon = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Icon>;
+        const PlayIcon = (p) => <Icon {...p}><polygon points="5 3 19 12 5 21 5 3"/></Icon>;
+        const ArrowLeftIcon = (p) => <Icon {...p}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></Icon>;
+        const XIcon = (p) => <Icon {...p}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></Icon>;
+        const SparklesIcon = (p) => <Icon {...p}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"/></Icon>;
+        const CheckCircleIcon = (p) => <Icon {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
+        const HDIcon = (p) => <Icon {...p}><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M7 15V9h2v2h2V9h2v6"/><path d="M15 9h2c1 0 1 .5 1 1v4c0 .5-.5 1-1 1h-2V9z"/></Icon>;
+        const AlertIcon = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></Icon>;
+
+        // --- Componentes ---
+        const QualityButton = ({ title, subtitle, icon: IconComp, onClick, colorClass = "from-slate-700 to-slate-800" }) => (
+            <button onClick={onClick} className="w-full group relative overflow-hidden bg-slate-800/40 hover:bg-slate-700/60 border border-slate-700/50 hover:border-slate-500 rounded-xl p-3 flex items-center justify-between transition-all duration-300 mb-2 hover:translate-x-1">
+                <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center text-white shadow-lg`}>
+                        <IconComp className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                        <div className="font-bold text-white text-sm">{title}</div>
+                        <div className="text-slate-400 text-[10px] uppercase tracking-wider">{subtitle}</div>
+                    </div>
+                </div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity"><DownloadIcon className="w-4 h-4 text-slate-300" /></div>
+            </button>
+        );
+
+        const VideoGridItem = ({ video, onClick, API_URL }) => {
+            const [isHovering, setIsHovering] = useState(false);
+            const [audioUrl, setAudioUrl] = useState(null);
+            const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+            const audioRef = useRef(null);
+            const hoverTimeoutRef = useRef(null);
+
+            const displayDuration = video.duration_string || formatDuration(video.duration) || "0:00";
+            const thumbUrl = getThumbnail(video);
+
+            const handleImgError = (e) => {
+                // Si la imagen falla, intentar forzar la HQ de YouTube directamente
+                const id = video.id || getYoutubeId(video.webpage_url || video.url);
+                if (id && !e.target.src.includes('hqdefault')) {
+                    e.target.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+                } else {
+                    e.target.src = "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?q=80&w=1000&auto=format&fit=crop";
+                    e.target.classList.add("opacity-50", "grayscale");
+                }
+            };
+
+            const handleMouseEnter = () => {
+                setIsHovering(true);
+                hoverTimeoutRef.current = setTimeout(async () => {
+                    if (!audioUrl) {
+                        setIsLoadingPreview(true);
+                        try {
+                            const res = await fetch(`${API_URL}/api/info?url=${encodeURIComponent(video.webpage_url || video.url)}&mode=full`);
+                            const data = await res.json();
+                            const format = data.formats?.find(f => f.acodec !== 'none' && f.vcodec === 'none' && f.url);
+                            if (format && format.url) {
+                                setAudioUrl(format.url);
+                            }
+                        } catch (e) {
+                            console.error("Preview error", e);
+                        } finally {
+                            setIsLoadingPreview(false);
+                        }
+                    }
+                }, 600);
+            };
+
+            const handleMouseLeave = () => {
+                setIsHovering(false);
+                if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                }
+            };
+
+            useEffect(() => {
+                if (isHovering && audioUrl && audioRef.current) {
+                    audioRef.current.volume = 0.5;
+                    audioRef.current.play().catch(e => console.log("Auto-play blocked", e));
+                }
+            }, [isHovering, audioUrl]);
+
+            return (
+                <div 
+                    onClick={() => onClick(video)} 
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    className="glass-card glass-card-hover rounded-xl overflow-hidden cursor-pointer transition-all duration-300 group flex flex-col h-full relative"
+                >
+                    <audio ref={audioRef} src={audioUrl} preload="none"></audio>
+                    
+                    <div className="relative aspect-video overflow-hidden bg-slate-900">
+                        <img 
+                            src={thumbUrl} 
+                            onError={handleImgError}
+                            alt={video.title} 
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                        
+                        <div className="absolute bottom-2 right-2 bg-black/80 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded-md border border-white/10 z-20 shadow-lg">
+                            {displayDuration}
+                        </div>
+
+                        {isHovering && isLoadingPreview && (
+                            <div className="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur rounded-full p-1.5 animate-pulse">
+                                <SparklesIcon className="w-3 h-3 text-violet-400" />
+                            </div>
+                        )}
+
+                        {isHovering && audioUrl && !isLoadingPreview && (
+                            <div className="absolute top-2 right-2 z-20 bg-violet-600/90 backdrop-blur rounded-full p-1.5 flex gap-0.5 h-6 items-center px-2">
+                                <div className="audio-bar"></div><div className="audio-bar"></div><div className="audio-bar"></div>
+                            </div>
+                        )}
+
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                            <div className="w-12 h-12 bg-violet-600/90 rounded-full flex items-center justify-center shadow-lg transform scale-0 group-hover:scale-100 transition-transform duration-300">
+                                <PlayIcon className="w-5 h-5 text-white ml-1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col">
+                        <h3 className="text-white font-bold text-sm mb-2 line-clamp-2 leading-tight group-hover:text-violet-300 transition-colors">{video.title}</h3>
+                        <div className="mt-auto flex items-center justify-between text-xs text-slate-400">
+                            <span className="truncate max-w-[60%] font-medium">{video.uploader || video.channel || video.author}</span>
+                            <span className="bg-white/5 px-2 py-0.5 rounded text-[10px]">{video.view_count ? Number(video.view_count).toLocaleString() + ' vistas' : ''}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const DownloadOverlay = ({ isVisible, format, qualityLabel, onClose, onComplete }) => {
+            const [progress, setProgress] = useState(0);
+            const [statusText, setStatusText] = useState("Iniciando...");
+
+            useEffect(() => {
+                if (isVisible) {
+                    setProgress(0);
+                    setStatusText("Conectando con DarkServer...");
+                    const t1 = setTimeout(() => { setProgress(25); setStatusText("Extrayendo metadata..."); }, 800);
+                    const t2 = setTimeout(() => { setProgress(55); setStatusText(`Procesando ${format === 'audio' ? 'Audio' : 'Video'} (${qualityLabel})...`); }, 1800);
+                    const t3 = setTimeout(() => { setProgress(85); setStatusText("Finalizando conversión..."); }, 2800);
+                    const t4 = setTimeout(() => { setProgress(100); setStatusText("¡Listo!"); onComplete(); }, 3500);
+                    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+                }
+            }, [isVisible, format, qualityLabel]);
+
+            if (!isVisible) return null;
+
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl animate-fade-in p-4">
+                    <div className="glass-card w-full max-w-sm p-8 rounded-3xl text-center relative overflow-hidden border border-white/10">
+                         <div className="relative z-10">
+                            <div className="mb-6 flex justify-center">
+                                <div className="w-20 h-20 rounded-full bg-black/50 flex items-center justify-center border border-white/10 shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+                                    {progress < 100 ? <SparklesIcon className="w-8 h-8 text-violet-400 animate-pulse" /> : <CheckCircleIcon className="w-10 h-10 text-emerald-400 animate-bounce" />}
+                                </div>
+                            </div>
+                            <h3 className="text-xl font-bold mb-1 text-white">{progress < 100 ? 'Descargando...' : 'Descarga Iniciada'}</h3>
+                            <p className="text-violet-300 text-xs font-medium uppercase tracking-widest mb-2">{qualityLabel}</p>
+                            <p className="text-slate-500 text-xs mb-6 h-4">{statusText}</p>
+                            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mb-2 relative">
+                                <div className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 transition-all duration-700 ease-out shadow-[0_0_15px_rgba(167,139,250,0.5)]" style={{ width: `${progress}%` }}></div>
+                            </div>
+                            {progress === 100 && <button onClick={onClose} className="mt-6 text-slate-400 hover:text-white text-xs underline decoration-slate-600 underline-offset-4 cursor-pointer">Cerrar</button>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        function App() {
+            const [inputValue, setInputValue] = useState('');
+            const [status, setStatus] = useState('idle'); 
+            const [videoInfo, setVideoInfo] = useState(null);
+            const [searchResults, setSearchResults] = useState(null);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [showDownloadModal, setShowDownloadModal] = useState(false);
+            const [downloadConfig, setDownloadConfig] = useState({ format: '', isAudio: false, qualityLabel: '' });
+
+            const API_URL = 'https://darksong-production.up.railway.app';
+
+            useEffect(() => {
+                const handlePopState = () => { if (status !== 'idle') resetApp(false); };
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, [status]);
+
+            const fetchVideoData = async (url) => {
+                setStatus('fetching');
+                setVideoInfo(null);
+                setSearchResults(null);
+                setIsPlaying(false);
+
+                try {
+                    const res = await fetch(`${API_URL}/api/info?url=${encodeURIComponent(url)}&mode=fast`);
+                    if (!res.ok) {
+                        if (res.status === 404) throw new Error('Not found');
+                        throw new Error('Server error');
+                    }
+                    const data = await res.json();
+                    
+                    if (data.entries) {
+                        setSearchResults(data.entries);
+                    } else if (Array.isArray(data)) {
+                         setSearchResults(data);
+                    } else {
+                        setVideoInfo(data);
+                    }
+                    
+                    setStatus('ready');
+                    window.history.pushState({ view: 'result' }, '');
+                } catch (err) {
+                    console.error("Search error:", err);
+                    if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+                        setStatus('connection_error');
+                    } else {
+                        setStatus('error');
+                    }
+                }
+            };
+
+            const handleSearch = (e) => {
+                e.preventDefault();
+                if (!inputValue.trim()) return;
+                let query = inputValue.trim();
+                const isUrl = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+/.test(query);
+                if (!isUrl) query = `ytsearch15:${query}`;
+                fetchVideoData(query);
+            };
+
+            const handleSelectVideo = (video) => {
+                const videoUrl = video.webpage_url || video.url;
+                if (videoUrl) {
+                    setInputValue(videoUrl);
+                    fetchVideoData(videoUrl);
+                }
+            };
+
+            const triggerDownloadProcess = (formatId, isAudio, label) => {
+                setDownloadConfig({ format: isAudio ? 'audio' : 'video', isAudio, formatId, qualityLabel: label });
+                setShowDownloadModal(true);
+            };
+
+            const executeDownload = () => {
+                const { formatId, isAudio } = downloadConfig;
+                const targetUrl = videoInfo.original_url || videoInfo.webpage_url || inputValue;
+                const downloadUrl = `${API_URL}/api/download?url=${encodeURIComponent(targetUrl)}&format_id=${formatId}&is_audio=${isAudio}`;
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => setShowDownloadModal(false), 2000);
+            };
+
+            const resetApp = (updateHistory = true) => {
+                setInputValue('');
+                setStatus('idle');
+                setVideoInfo(null);
+                setSearchResults(null);
+                setIsPlaying(false);
+                if (updateHistory && window.history.state) window.history.back();
+            };
+
+            const getYoutubeId = (url) => {
+                if (!url) return null;
+                const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
+                return (match && match[2].length === 11) ? match[2] : null;
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-dark flex flex-col relative selection:bg-violet-500 selection:text-white">
+                    <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-violet-900/20 rounded-full blur-[120px] pointer-events-none animate-pulse-glow"></div>
+                    <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-fuchsia-900/20 rounded-full blur-[120px] pointer-events-none animate-pulse-glow" style={{ animationDelay: '1.5s' }}></div>
+
+                    <nav className="relative z-50 px-6 py-6 flex items-center justify-between">
+                        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => resetApp()}>
+                            <img src="https://i.postimg.cc/rpn123gJ/Diseno-sin-titulo-(23).png" alt="Logo" className="w-12 h-12 object-contain rounded-full drop-shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:scale-110 transition-transform duration-300 bg-black/50" />
+                            <span className="text-2xl font-bold tracking-tight"><span className="text-white">Dark</span><span className="text-purple-500 neon-text-purple">Song</span></span>
+                        </div>
+                    </nav>
+
+                    <main className="flex-1 flex flex-col items-center p-4 relative z-10 w-full max-w-6xl mx-auto">
+                        
+                        <div className={`w-full max-w-2xl transition-all duration-700 ease-out transform ${status === 'ready' ? 'translate-y-0 opacity-100 scale-100 mb-8' : (status === 'idle' ? 'translate-y-[20vh] opacity-100' : 'translate-y-0 opacity-100')}`}>
+                            {status === 'idle' && (
+                                <div className="text-center mb-12 space-y-4">
+                                    <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight">Música sin <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">Límites.</span></h1>
+                                    <p className="text-slate-400 text-lg md:text-xl font-light max-w-lg mx-auto">Descarga Música y Videos con el Link o nombre a máxima calidad.</p>
+                                </div>
+                            )}
+
+                            <div className={`glass-card rounded-2xl p-2 transition-all duration-300 neon-border ${status === 'ready' ? 'mx-auto' : ''}`}>
+                                <form onSubmit={handleSearch} className="relative flex items-center">
+                                    <div className="absolute left-5 text-slate-400">
+                                        {status === 'fetching' ? <div className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div> : <SearchIcon className="w-5 h-5" />}
+                                    </div>
+                                    <input type="text" placeholder="Busca una canción, artista o pega un enlace..." className="w-full bg-transparent text-white placeholder-slate-600 rounded-xl py-4 pl-14 pr-36 focus:outline-none text-lg font-medium" value={inputValue} onChange={(e) => setInputValue(e.target.value)} disabled={status === 'fetching'} autoFocus />
+                                    <button type="submit" disabled={!inputValue || status === 'fetching'} className="absolute right-2 bg-white text-black hover:bg-slate-200 px-6 py-2 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]">Buscar</button>
+                                </form>
+                            </div>
+
+                            {status === 'error' && (
+                                <div className="mt-6 text-center text-red-400 bg-red-950/20 border border-red-900/50 p-4 rounded-xl animate-slide-up">
+                                    <p className="flex items-center justify-center gap-2"><XIcon className="w-4 h-4" /> No se pudo encontrar el contenido. Intenta de nuevo.</p>
+                                </div>
+                            )}
+                            
+                            {status === 'connection_error' && (
+                                <div className="mt-6 text-center text-amber-400 bg-amber-950/20 border border-amber-900/50 p-4 rounded-xl animate-slide-up">
+                                    <p className="flex items-center justify-center gap-2 font-bold mb-1"><AlertIcon className="w-5 h-5" /> Error de Conexión</p>
+                                    <p className="text-sm opacity-90">El servidor en Railway parece estar apagado o iniciándose.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {status === 'ready' && searchResults && (
+                            <div className="w-full animate-slide-up">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-xl font-bold text-white flex items-center gap-2"><SearchIcon className="w-5 h-5 text-violet-400" /> Resultados encontrados</h2>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {searchResults.map((item, idx) => (
+                                        <VideoGridItem key={item.id || idx} video={item} onClick={handleSelectVideo} API_URL={API_URL} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {status === 'ready' && videoInfo && (
+                            <div className="w-full animate-slide-up max-w-5xl">
+                                <button onClick={() => resetApp(false)} className="mb-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors pl-2 hover:-translate-x-1 duration-300"><ArrowLeftIcon className="w-5 h-5" /><span className="font-medium">Volver a buscar</span></button>
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                    <div className="lg:col-span-7 space-y-6">
+                                        <div className="glass-card rounded-[2rem] overflow-hidden p-1 relative group">
+                                            <div className="relative rounded-[1.8rem] overflow-hidden bg-black aspect-video shadow-2xl">
+                                                {isPlaying ? (
+                                                    <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${videoInfo.id || getYoutubeId(videoInfo.webpage_url)}?autoplay=1&modestbranding=1&rel=0&showinfo=0`} title="Player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                                ) : (
+                                                    <>
+                                                        <img src={getThumbnail(videoInfo)} onError={(e) => {
+                                                            const id = videoInfo.id || getYoutubeId(videoInfo.webpage_url);
+                                                            if (id && !e.target.src.includes('hqdefault')) {
+                                                                e.target.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+                                                            } else {
+                                                                e.target.src = "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?q=80&w=1000&auto=format&fit=crop";
+                                                            }
+                                                        }} alt={videoInfo.title} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700 ease-in-out" />
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                                                            <button onClick={() => setIsPlaying(true)} className="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:scale-110 hover:bg-violet-600 hover:border-violet-500 transition-all duration-300 shadow-[0_0_40px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_50px_rgba(139,92,246,0.5)]"><PlayIcon className="w-8 h-8 fill-current ml-1" /></button>
+                                                        </div>
+                                                        <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/10">{videoInfo.duration_string || formatDuration(videoInfo.duration) || '0:00'}</div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="px-2">
+                                            <h2 className="text-3xl font-bold text-white leading-tight mb-2 line-clamp-2">{videoInfo.title}</h2>
+                                            <div className="flex items-center gap-3 text-slate-400 text-sm font-medium"><span className="text-violet-400 bg-violet-900/20 px-3 py-1 rounded-full border border-violet-500/20">{videoInfo.uploader || videoInfo.author}</span><span>•</span><span>{videoInfo.view_count ? Number(videoInfo.view_count).toLocaleString() + ' vistas' : 'Vistas no disp.'}</span></div>
+                                        </div>
+                                    </div>
+                                    <div className="lg:col-span-5 flex flex-col justify-start">
+                                        <div className="glass-card rounded-3xl p-6 relative overflow-hidden h-full">
+                                            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2 border-b border-white/10 pb-4"><SparklesIcon className="w-5 h-5 text-yellow-400" />Selecciona la Calidad</h3>
+                                            <div className="space-y-6 relative z-10 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
+                                                <div>
+                                                    <h4 className="text-violet-300 text-xs font-extrabold uppercase tracking-widest mb-3 flex items-center gap-2"><MusicIcon className="w-4 h-4" /> Formatos de Audio</h4>
+                                                    <div className="space-y-2">
+                                                        <QualityButton title="MP3 320kbps" subtitle="Máxima Calidad (HQ)" icon={MusicIcon} colorClass="from-violet-600 to-violet-800" onClick={() => triggerDownloadProcess('bestaudio/best', true, 'MP3 320kbps')} />
+                                                        <QualityButton title="MP3 128kbps" subtitle="Calidad Estándar" icon={MusicIcon} colorClass="from-slate-700 to-slate-800" onClick={() => triggerDownloadProcess('worstaudio', true, 'MP3 128kbps')} />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-fuchsia-300 text-xs font-extrabold uppercase tracking-widest mb-3 flex items-center gap-2"><VideoIcon className="w-4 h-4" /> Formatos de Video</h4>
+                                                    <div className="space-y-2">
+                                                        <QualityButton title="1080p Full HD" subtitle="Video MP4 (Alta Definición)" icon={HDIcon} colorClass="from-fuchsia-600 to-fuchsia-800" onClick={() => triggerDownloadProcess('bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', false, '1080p Full HD')} />
+                                                        <QualityButton title="720p HD" subtitle="Video MP4 (Equilibrado)" icon={VideoIcon} colorClass="from-pink-600 to-pink-800" onClick={() => triggerDownloadProcess('best[height<=720][ext=mp4]', false, '720p HD')} />
+                                                        <QualityButton title="480p SD" subtitle="Video MP4 (Ligero)" icon={VideoIcon} colorClass="from-slate-700 to-slate-800" onClick={() => triggerDownloadProcess('worst[ext=mp4]', false, '480p SD')} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                    <footer className="w-full p-6 text-center text-slate-600 text-sm relative z-10"><p>© 2024 DarkSong Studio. Designed for quality.</p></footer>
+                    <DownloadOverlay isVisible={showDownloadModal} format={downloadConfig.format} qualityLabel={downloadConfig.qualityLabel} onClose={() => setShowDownloadModal(false)} onComplete={executeDownload} />
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
