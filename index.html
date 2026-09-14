@@ -1,224 +1,865 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gabrioff | Enlaces Oficiales</title>
+    <title>Darksong | Descarga Oficial & Comunidades</title>
+    <!-- Fuentes y Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Tailwind CSS para el diseño rápido y moderno -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons para iconos hermosos y ligeros -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #00ffa3;
+            --secondary: #00d1ff;
+            --bg: #030303;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --border: rgba(255, 255, 255, 0.1);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --glass: rgba(10, 10, 10, 0.8);
+            --discord: #5865F2;
+            --telegram: #229ED9;
+        }
 
-    <!-- Configuración personalizada de Tailwind -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        blob: "blob 7s infinite",
-                        'fade-in-up': "fadeInUp 0.8s ease-out forwards",
-                        'bounce-subtle': "bounceSubtle 2s infinite"
-                    },
-                    keyframes: {
-                        blob: {
-                            "0%": { transform: "translate(0px, 0px) scale(1)" },
-                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
-                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-                            "100%": { transform: "translate(0px, 0px) scale(1)" }
-                        },
-                        fadeInUp: {
-                            "0%": { opacity: "0", transform: "translateY(20px)" },
-                            "100%": { opacity: "1", transform: "translateY(0)" }
-                        },
-                        bounceSubtle: {
-                            "0%, 100%": { transform: "translateY(-5%)" },
-                            "50%": { transform: "translateY(0)" }
-                        }
-                    }
-                }
+        [data-theme="light"] {
+            --primary: #00a86b;
+            --secondary: #0070f3;
+            --bg: #f5f5f7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text: #1d1d1f;
+            --text-dim: #86868b;
+            --border: rgba(0, 0, 0, 0.1);
+            --glass: rgba(255, 255, 255, 0.9);
+            --discord: #4752C4;
+            --telegram: #0088cc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .glow {
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(0, 255, 163, 0.08) 0%, transparent 70%);
+            top: -20vw;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        nav {
+            width: 100%;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            background: var(--glass);
+        }
+
+        .brand { 
+            font-weight: 900; 
+            font-size: 1.3rem; 
+            background: var(--gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .nav-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .social-link, .theme-btn {
+            color: var(--text);
+            text-decoration: none;
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .social-link:hover, .theme-btn:hover { 
+            border-color: var(--primary); 
+            transform: translateY(-2px); 
+        }
+
+        .social-link.discord:hover { border-color: var(--discord); color: var(--discord); }
+        .social-link.telegram:hover { border-color: var(--telegram); color: var(--telegram); }
+
+        main { 
+            width: 100%; 
+            max-width: 1200px; 
+            padding-top: 100px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        /* --- Hero --- */
+        .hero {
+            padding: 50px 20px 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .main-icon-wrapper { margin-bottom: 25px; position: relative; }
+        .main-icon {
+            width: 200px;
+            height: 200px;
+            border-radius: 45px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            border: 2px solid var(--border);
+            object-fit: cover;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        .creator-badge {
+            background: var(--card-bg);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
+        h1 { font-size: clamp(2.8rem, 8vw, 4.5rem); font-weight: 900; letter-spacing: -2px; margin-bottom: 10px; line-height: 1; }
+
+        .badges-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
+        .badge-info {
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-info.virus { color: #00ffa3; }
+        .badge-info.size { color: #00d1ff; }
+
+        .stats-container { display: flex; gap: 40px; margin-bottom: 30px; justify-content: center; }
+        .stat-value { font-size: 2.2rem; font-weight: 900; display: block; color: var(--text); }
+        .stat-label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        .btn-dl {
+            background: var(--text);
+            color: var(--bg);
+            padding: 18px 45px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.15rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn-dl:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 15px 35px rgba(0, 255, 163, 0.3); 
+            background: var(--primary);
+            color: #000;
+        }
+
+        .app-brief { max-width: 480px; color: var(--text-dim); font-size: 1rem; margin: 0 auto; line-height: 1.5; }
+
+        /* --- COMUNIDADES EN GRANDE --- */
+        .communities-section {
+            width: 100%;
+            max-width: 780px;
+            padding: 40px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--secondary);
+            margin-bottom: 12px;
+        }
+
+        .section-heading {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: -1px;
+        }
+
+        .community-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        @media (min-width: 680px) {
+            .community-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
-    </script>
 
-    <style>
-        /* Estilos base y utilidades para el efecto de cristal y animaciones en cascada */
-        body {
-            background-color: #0f172a; /* Slate 900 */
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
+        .community-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            border-radius: 24px;
+            text-decoration: none;
+            color: var(--text);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        /* Retrasos para la animación de entrada de los botones */
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
+        .community-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            z-index: 0;
+        }
 
-        /* Ocultar elementos antes de la animación */
-        .opacity-0-init { opacity: 0; }
+        .community-card.discord::before {
+            background: radial-gradient(circle at top left, rgba(88, 101, 242, 0.25), transparent 70%);
+        }
+
+        .community-card.telegram::before {
+            background: radial-gradient(circle at top left, rgba(34, 158, 217, 0.25), transparent 70%);
+        }
+
+        .community-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .community-card:hover::before {
+            opacity: 1;
+        }
+
+        .community-card.discord:hover {
+            border-color: var(--discord);
+            box-shadow: 0 15px 35px -5px rgba(88, 101, 242, 0.4);
+        }
+
+        .community-card.telegram:hover {
+            border-color: var(--telegram);
+            box-shadow: 0 15px 35px -5px rgba(34, 158, 217, 0.4);
+        }
+
+        .card-icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #ffffff;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .community-card:hover .card-icon-box {
+            transform: scale(1.12) rotate(3deg);
+        }
+
+        .card-icon-box.discord {
+            background: linear-gradient(135deg, #5865F2, #4752C4);
+            box-shadow: 0 10px 20px rgba(88, 101, 242, 0.4);
+        }
+
+        .card-icon-box.telegram {
+            background: linear-gradient(135deg, #229ED9, #0088cc);
+            box-shadow: 0 10px 20px rgba(34, 158, 217, 0.4);
+        }
+
+        .card-content {
+            flex: 1;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .card-status.discord { color: #8ea1e1; }
+        .card-status.telegram { color: #64c5f9; }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse-animation 2s infinite;
+        }
+
+        .pulse-dot.green { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .pulse-dot.cyan { background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+
+        @keyframes pulse-animation {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .card-arrow {
+            position: relative;
+            z-index: 1;
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .community-card:hover .card-arrow {
+            transform: translateX(5px);
+            color: var(--text);
+        }
+
+        /* --- Gallery --- */
+        .gallery { width: 100%; padding: 40px 0; overflow: hidden; }
+        .gallery-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 0 5%;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+        .app-shot {
+            min-width: 260px;
+            height: 540px;
+            border-radius: 30px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            scroll-snap-align: center;
+        }
+
+        /* --- Reviews --- */
+        .reviews-section { width: 100%; max-width: 800px; padding: 60px 20px; }
+        .comment-form {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 25px;
+            border: 1px solid var(--border);
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .stars-input { display: flex; gap: 5px; margin: 15px 0; }
+        .star-radio { font-size: 2rem; color: var(--text-dim); cursor: pointer; transition: 0.2s; }
+        .star-radio.active { color: #ffcc00; }
+
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            color: var(--text);
+            margin-bottom: 15px;
+            resize: none;
+            outline: none;
+        }
+
+        .btn-send {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        .btn-send:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .comments-list { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
+        .comment-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        footer { 
+            padding: 50px 20px; 
+            text-align: center; 
+            border-top: 1px solid var(--border); 
+            width: 100%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 3.2rem; }
+            .stats-container { gap: 20px; }
+            .main-icon { width: 170px; height: 170px; }
+            .community-card { padding: 18px; }
+            .card-icon-box { width: 54px; height: 54px; font-size: 1.6rem; }
+            .card-title { font-size: 1.15rem; }
+        }
+
+        .reveal { opacity: 0; transform: translateY(20px); transition: 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        #starLabel { color: #ffcc00; font-size: 1.1rem; }
+
+        /* --- Custom Modals CSS --- */
+        .custom-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            z-index: 9999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease;
+        }
+        .custom-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .custom-modal-box {
+            background: var(--bg); border: 1px solid var(--border);
+            padding: 35px 25px; border-radius: 25px; text-align: center; 
+            max-width: 400px; width: 90%;
+            transform: translateY(20px) scale(0.95); transition: 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .custom-modal-overlay.active .custom-modal-box { transform: translateY(0) scale(1); }
+        .modal-btn {
+            background: var(--primary); color: #000; border: none; padding: 14px 25px;
+            border-radius: 14px; font-weight: 800; cursor: pointer; margin-top: 20px; 
+            width: 100%; font-size: 1rem; transition: 0.3s;
+        }
+        .modal-btn:hover { opacity: 0.9; transform: scale(1.02); }
+        .modal-btn-alt {
+            background: transparent; color: var(--text-dim); border: 1px solid var(--border); 
+            margin-top: 10px;
+        }
+        .modal-btn-alt:hover { border-color: var(--text); color: var(--text); }
     </style>
 </head>
-<body class="text-white min-h-screen flex flex-col items-center justify-center p-4 relative overflow-x-hidden selection:bg-purple-500 selection:text-white">
+<body>
 
-    <!-- Fondos Animados (Blobs) -->
-    <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none flex justify-center items-center">
-        <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob"></div>
-        <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-1/4 left-1/2 w-72 h-72 bg-pink-600 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob animation-delay-4000"></div>
+    <div class="glow"></div>
+
+    <!-- Modal: Advertencia de Navegador In-App (TikTok) -->
+    <div id="browserModal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <span class="material-symbols-rounded" style="font-size: 50px; color: var(--secondary); margin-bottom: 15px;">open_in_browser</span>
+            <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Abre en Chrome</h3>
+            <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px;">
+                Parece que nos visitas desde TikTok u otra red social. Para que la descarga funcione sin errores, por favor abre esta página en Google Chrome o tu navegador principal.
+            </p>
+            <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 20px;">
+                <em>Toca los 3 puntos arriba a la derecha y selecciona "Abrir en el navegador"</em>
+            </p>
+            <button class="modal-btn" id="btnForceChrome">Intentar abrir Chrome</button>
+            <button class="modal-btn modal-btn-alt" onclick="document.getElementById('browserModal').classList.remove('active')">Continuar aquí de todos modos</button>
+        </div>
     </div>
 
-    <!-- Contenedor Principal -->
-    <main class="relative z-10 w-full max-w-md mx-auto flex flex-col items-center pt-8 pb-12">
-        
-        <!-- Sección de Perfil -->
-        <header class="flex flex-col items-center text-center mb-8 animate-fade-in-up opacity-0-init">
-            <div class="relative group cursor-pointer mb-4">
-                <!-- Efecto de brillo detrás de la foto -->
-                <div class="absolute -inset-1 bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 rounded-full blur opacity-70 group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-pulse"></div>
-                <!-- Foto de perfil actualizada -->
-                <img src="https://i.postimg.cc/5t99QwPT/photo-2025-12-17-13-45-30.jpg" 
-                     alt="Foto de perfil de Gabrioff" 
-                     class="relative w-28 h-28 object-cover rounded-full border-2 border-white/20 transition-transform duration-300 group-hover:scale-105">
-            </div>
-            
-            <h1 class="text-3xl font-extrabold tracking-tight mb-2 flex items-center gap-2">
-                Gabrioff
-                <!-- Icono de verificado (opcional) -->
-                <i data-lucide="badge-check" class="w-6 h-6 text-blue-400"></i>
-            </h1>
-            <p class="text-gray-300 text-sm font-medium px-4">
-                Creador de Contenido | Desarrollador | Editor
+    <!-- Modal: Advertencia de Ad para descargar -->
+    <div id="adModal" class="custom-modal-overlay">
+        <div class="custom-modal-box">
+            <span class="material-symbols-rounded" style="font-size: 50px; color: var(--primary); margin-bottom: 15px;">favorite</span>
+            <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Apoya el Proyecto</h3>
+            <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
+                A continuación se te mostrará un anuncio para apoyar el desarrollo. Luego del anuncio se iniciará la descarga del APK de Darksong. ¡Gracias por tu apoyo!
             </p>
-        </header>
+            <button class="modal-btn" id="btnContinueDownload">Entendido, Continuar</button>
+            <button class="modal-btn modal-btn-alt" onclick="document.getElementById('adModal').classList.remove('active')">Cancelar</button>
+        </div>
+    </div>
 
-        <!-- Sección de Enlaces (Botones) -->
-        <nav class="w-full flex flex-col gap-4">
+    <nav>
+        <div class="brand">DARKSONG</div>
+        <div class="nav-actions">
+            <a href="https://discord.gg/KCvPnTykKp" target="_blank" rel="noopener noreferrer" class="social-link discord" title="Discord"><i class="fa-brands fa-discord"></i></a>
+            <a href="https://t.me/gabrioffYT" target="_blank" rel="noopener noreferrer" class="social-link telegram" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+            <a href="https://www.tiktok.com/@gabrioff0" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://youtube.com/channel/UCi6bOliSGytVqftqzw5g91g?themeRefresh=1" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            <button class="theme-btn" id="themeBtn" title="Cambiar Tema"><span class="material-symbols-rounded" id="themeIcon">dark_mode</span></button>
+        </div>
+    </nav>
+
+    <main>
+        <!-- SECCIÓN HERO / DESCARGA PRINCIPAL -->
+        <section class="hero reveal">
+            <div class="main-icon-wrapper">
+                <img src="https://i.postimg.cc/GmyB6C9V/Diseno-sin-titulo-(23).png" alt="Darksong Logo" class="main-icon">
+            </div>
             
-            <!-- Botón 1: App Beta -->
-            <a href="https://darksong.vercel.app/" target="_blank" rel="noopener noreferrer" 
-               class="opacity-0-init animate-fade-in-up delay-100 group relative w-full flex items-center p-4 glass-panel rounded-2xl hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-purple-500/20 transition-all duration-300 overflow-hidden">
-                <!-- Brillo al hacer hover -->
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-purple-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                
-                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-500/20 text-purple-400 mr-4 group-hover:scale-110 transition-transform duration-300">
-                    <i data-lucide="rocket" class="w-6 h-6 group-hover:animate-bounce-subtle"></i>
-                </div>
-                <div class="flex-1 text-left">
-                    <h2 class="text-base font-bold text-white group-hover:text-purple-300 transition-colors">Accede a la beta de la app</h2>
-                    <p class="text-xs text-gray-400 mt-0.5">Prueba lo último antes que nadie</p>
-                </div>
-                <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-1 duration-300"></i>
-            </a>
+            <span class="creator-badge">Desarrollado por Gabrioff</span>
+            <h1>Darksong</h1>
 
-            <!-- Botón 2: Comunidad Telegram -->
-            <a href="https://t.me/gabrioffYT" target="_blank" rel="noopener noreferrer" 
-               class="opacity-0-init animate-fade-in-up delay-200 group relative w-full flex items-center p-4 glass-panel rounded-2xl hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-blue-500/20 transition-all duration-300 overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                
-                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 mr-4 group-hover:scale-110 transition-transform duration-300">
-                    <i data-lucide="send" class="w-6 h-6 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300"></i>
+            <div class="badges-row">
+                <div class="badge-info virus">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">security</span> 100% Libre de Virus
                 </div>
-                <div class="flex-1 text-left">
-                    <h2 class="text-base font-bold text-white group-hover:text-blue-300 transition-colors">Únete a la comunidad</h2>
-                    <p class="text-xs text-gray-400 mt-0.5">Interactúa en nuestro Telegram</p>
-                </div>
-                <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-1 duration-300"></i>
-            </a>
-
-            <!-- Botón 3: Comunidad Discord (¡ACTUALIZADO!) -->
-            <a href="https://discord.gg/KCvPnTykKp" target="_blank" rel="noopener noreferrer" 
-               class="opacity-0-init animate-fade-in-up delay-300 group relative w-full flex items-center p-4 glass-panel rounded-2xl hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-indigo-500/20 transition-all duration-300 overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/10 to-indigo-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                
-                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 mr-4 group-hover:scale-110 transition-transform duration-300">
-                    <!-- Icono SVG oficial de Discord -->
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 group-hover:-translate-y-0.5 transition-transform duration-300">
-                        <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
-                    </svg>
-                </div>
-                <div class="flex-1 text-left">
-                    <h2 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">Servidor de Discord</h2>
-                    <p class="text-xs text-gray-400 mt-0.5">Únete al chat de voz y texto</p>
-                </div>
-                <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500 group-hover:text-white transition-colors transform group-hover:translate-x-1 duration-300"></i>
-            </a>
-
-            <!-- Botón 4: Contacto / Contrataciones (Menú Desplegable) -->
-            <div class="w-full opacity-0-init animate-fade-in-up delay-400 flex flex-col gap-2">
-                <button onclick="toggleSubMenu('contactMenu')" 
-                    class="group relative w-full flex items-center p-4 glass-panel rounded-2xl hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-pink-500/20 transition-all duration-300 overflow-hidden cursor-pointer">
-                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500/0 via-pink-500/10 to-pink-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                    
-                    <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-pink-500/20 text-pink-400 mr-4 group-hover:scale-110 transition-transform duration-300">
-                        <i data-lucide="code-2" class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300"></i>
-                    </div>
-                    <div class="flex-1 text-left">
-                        <h2 class="text-base font-bold text-white group-hover:text-pink-300 transition-colors">¿Buscas Programador o Editor?</h2>
-                        <p class="text-xs text-gray-400 mt-0.5">Escríbeme para trabajar juntos</p>
-                    </div>
-                    <!-- Icono de flecha que girará -->
-                    <i id="contactIcon" data-lucide="chevron-down" class="w-5 h-5 text-gray-500 group-hover:text-white transition-transform duration-300"></i>
-                </button>
-
-                <!-- Submenú Expandible -->
-                <div id="contactMenu" class="hidden flex-col gap-2 pl-4 pr-4 pb-2 pt-1 opacity-0 transition-opacity duration-300">
-                    <!-- Opción Telegram -->
-                    <a href="https://t.me/Pepetrenchs" target="_blank" rel="noopener noreferrer" 
-                       class="flex items-center p-3 glass-panel rounded-xl hover:bg-white/10 transition-colors group">
-                        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 mr-3">
-                            <i data-lucide="send" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-200 group-hover:text-white">Escribir por Telegram</span>
-                    </a>
-                    
-                    <!-- Opción TikTok -->
-                    <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" 
-                       class="flex items-center p-3 glass-panel rounded-xl hover:bg-white/10 transition-colors group">
-                        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-black/40 text-white mr-3 border border-gray-700">
-                            <i data-lucide="video" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-200 group-hover:text-white">Contáctame a mi DM en TikTok</span>
-                    </a>
+                <div class="badge-info size">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">box</span> 28 MB
                 </div>
             </div>
 
-        </nav>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-value" id="avgRating">0.0</span>
+                    <span class="stat-label" id="starLabel">☆☆☆☆☆</span>
+                    <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 5px;">PROMEDIO REAL</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">+10K</span>
+                    <span class="stat-label">Descargas</span>
+                </div>
+            </div>
 
+            <!-- Botón de descarga principal -->
+            <a href="#" id="downloadBtnMain" class="btn-dl">
+                <span class="material-symbols-rounded">download</span> Obtener APK Gratis
+            </a>
+
+            <p class="app-brief">
+                Darksong es un reproductor de música local que te ofrece funciones exclusivas como modo offline total, efectos de audio envolventes y una experiencia <strong>sin anuncios intrusivos</strong>.
+            </p>
+        </section>
+
+        <!-- SECCIÓN COMUNIDADES EN GRANDE (DISCORD & TELEGRAM) -->
+        <section class="communities-section reveal">
+            <div class="section-tag">
+                <span class="material-symbols-rounded" style="font-size: 16px;">groups</span>
+                Comunidades Oficiales
+            </div>
+            <h2 class="section-heading">Únete a la Comunidad</h2>
+
+            <div class="community-grid">
+                <!-- TARJETA GRANDE DE DISCORD -->
+                <a href="https://discord.gg/KCvPnTykKp" target="_blank" rel="noopener noreferrer" class="community-card discord">
+                    <div class="card-icon-box discord">
+                        <i class="fa-brands fa-discord"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-status discord">
+                            <span class="pulse-dot green"></span>
+                            Servidor Oficial
+                        </div>
+                        <h3 class="card-title">Servidor de Discord</h3>
+                        <p class="card-desc">Chatea por voz y texto, obtén soporte directo y participa en eventos.</p>
+                    </div>
+                    <div class="card-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </a>
+
+                <!-- TARJETA GRANDE DE TELEGRAM -->
+                <a href="https://t.me/gabrioffYT" target="_blank" rel="noopener noreferrer" class="community-card telegram">
+                    <div class="card-icon-box telegram">
+                        <i class="fa-brands fa-telegram"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-status telegram">
+                            <span class="pulse-dot cyan"></span>
+                            Canal & Grupo
+                        </div>
+                        <h3 class="card-title">Comunidad de Telegram</h3>
+                        <p class="card-desc">Descargas directas del APK, avisos prioritarios y novedades al instante.</p>
+                    </div>
+                    <div class="card-arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- GALERÍA DE CAPTURAS -->
+        <section class="gallery reveal">
+            <div class="gallery-scroll">
+                <img src="https://i.postimg.cc/HW8rPMnB/photo-2026-04-03-11-02-17.jpg" class="app-shot" alt="Screenshot 1">
+                <img src="https://i.postimg.cc/P5TNxF4w/photo-2026-04-03-11-02-14.jpg" class="app-shot" alt="Screenshot 2">
+                <img src="https://i.postimg.cc/rwjstCnH/photo-2026-04-03-11-02-11.jpg" class="app-shot" alt="Screenshot 3">
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE RESEÑAS -->
+        <section class="reviews-section reveal">
+            <h2 style="text-align: center; margin-bottom: 10px;">Opiniones de la Comunidad</h2>
+            <p style="text-align: center; color: var(--text-dim); font-size: 0.9rem;">El promedio superior se actualiza en tiempo real con cada reseña.</p>
+            
+            <div class="comment-form">
+                <div class="stars-input" id="starInput">
+                    <span class="material-symbols-rounded star-radio active" data-v="1">star</span>
+                    <span class="material-symbols-rounded star-radio active" data-v="2">star</span>
+                    <span class="material-symbols-rounded star-radio active" data-v="3">star</span>
+                    <span class="material-symbols-rounded star-radio active" data-v="4">star</span>
+                    <span class="material-symbols-rounded star-radio active" data-v="5">star</span>
+                </div>
+                <textarea class="comment-input" id="commentText" placeholder="Cuéntanos qué tal te funciona la app..." rows="3"></textarea>
+                <button class="btn-send" id="btnSend">Enviar Reseña</button>
+            </div>
+
+            <div class="comments-list" id="commentsList">
+                <!-- Se cargan vía Firebase -->
+            </div>
+        </section>
     </main>
 
-    <!-- Inicialización de los Iconos y Lógica -->
-    <script>
-        lucide.createIcons();
+    <footer>
+        <div class="footer-socials">
+            <a href="https://discord.gg/KCvPnTykKp" target="_blank" rel="noopener noreferrer" class="social-link discord" title="Discord"><i class="fa-brands fa-discord"></i></a>
+            <a href="https://t.me/gabrioffYT" target="_blank" rel="noopener noreferrer" class="social-link telegram" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+            <a href="https://www.tiktok.com/@gabrioff0" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://youtube.com/channel/UCi6bOliSGytVqftqzw5g91g?themeRefresh=1" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+        <p style="font-weight: 800; margin-bottom: 5px; font-size: 1.1rem; letter-spacing: 1px;">DARKSONG</p>
+        <p style="font-size: 0.85rem; opacity: 0.6;">&copy; 2024 - 2026 Gabrioff • Proyecto DarkSong. Todos los derechos reservados.</p>
+    </footer>
 
-        // Función para abrir y cerrar el menú desplegable de contacto
-        function toggleSubMenu(id) {
-            const menu = document.getElementById(id);
-            const icon = document.getElementById('contactIcon');
-            
-            if (menu.classList.contains('hidden')) {
-                // Abrir menú
-                menu.classList.remove('hidden');
-                menu.classList.add('flex');
-                setTimeout(() => menu.classList.remove('opacity-0'), 10); // Animación suave
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                // Cerrar menú
-                menu.classList.add('opacity-0');
-                icon.style.transform = 'rotate(0deg)';
-                setTimeout(() => {
-                    menu.classList.add('hidden');
-                    menu.classList.remove('flex');
-                }, 300); // Esperar a que termine la transición
-            }
+    <!-- Lógica de Interacciones de Descarga y Navegador -->
+    <script>
+        // 1. Detectar si el usuario viene de un navegador integrado (TikTok, FB, IG)
+        function isInAppBrowser() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            return (ua.indexOf("TikTok") > -1 || ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Instagram") > -1);
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Si está en TikTok u otra app, mostramos la alerta inicial
+            if (isInAppBrowser()) {
+                document.getElementById('browserModal').classList.add('active');
+            }
+
+            // Lógica para intentar forzar la apertura en Chrome (Android)
+            document.getElementById('btnForceChrome').addEventListener('click', () => {
+                const url = window.location.href.replace(/^https?:\/\//, '');
+                window.location.href = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end;`;
+            });
+
+            // 2. Lógica del botón de descarga y el Ad
+            const downloadBtn = document.getElementById('downloadBtnMain');
+            const adModal = document.getElementById('adModal');
+            const btnContinueDownload = document.getElementById('btnContinueDownload');
+
+            downloadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                adModal.classList.add('active');
+            });
+
+            btnContinueDownload.addEventListener('click', () => {
+                adModal.classList.remove('active');
+                
+                // Script del Ad de Monetag
+                (function(s){s.dataset.zone='10837694',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+
+                // Redirección al APK oficial
+                setTimeout(() => {
+                    window.location.href = "https://github.com/Gabrioff/darksongdescargable/releases/download/1.2/app-release.apk";
+                    console.log("Iniciando descarga de Darksong...");
+                }, 1000);
+            });
+        });
+    </script>
+
+    <!-- Lógica de Firebase para Reseñas -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAvG_9zWgGjetWNz9nwIQIXosWZTDQ-hDo",
+            authDomain: "darksong-9b04f.firebaseapp.com",
+            projectId: "darksong-9b04f",
+            storageBucket: "darksong-9b04f.firebasestorage.app",
+            messagingSenderId: "630027086230",
+            appId: "1:630027086230:web:5f6e743f604832998555b7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = "darksong-official";
+
+        let userUid = null;
+        let ratingInput = 5;
+
+        // Auth
+        signInAnonymously(auth).catch(e => console.error("Error de autenticación", e));
+        onAuthStateChanged(auth, u => { if(u) userUid = u.uid; });
+
+        // Lógica visual de selección de estrellas
+        const starRadios = document.querySelectorAll('.star-radio');
+        starRadios.forEach(s => {
+            s.addEventListener('click', () => {
+                ratingInput = parseInt(s.dataset.v);
+                starRadios.forEach((st, i) => {
+                    st.classList.toggle('active', i < ratingInput);
+                    st.style.fontVariationSettings = i < ratingInput ? "'FILL' 1" : "'FILL' 0";
+                });
+            });
+        });
+
+        // Enviar reseña
+        const btnSend = document.getElementById('btnSend');
+        const commentInput = document.getElementById('commentText');
+        
+        btnSend.addEventListener('click', async () => {
+            const text = commentInput.value.trim();
+            if(!text || !userUid) return;
+            
+            btnSend.disabled = true;
+            btnSend.innerText = "Enviando...";
+            
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'reviews'), {
+                    text: text,
+                    stars: ratingInput,
+                    user: userUid.slice(0, 5),
+                    date: serverTimestamp()
+                });
+                commentInput.value = "";
+                btnSend.innerText = "Enviar Reseña";
+            } catch (error) {
+                console.error("Error al enviar:", error);
+                btnSend.innerText = "Error - Reintentar";
+            } finally {
+                btnSend.disabled = false;
+            }
+        });
+
+        // Cargar reseñas y calcular promedio real
+        const avgRatingText = document.getElementById('avgRating');
+        const starLabel = document.getElementById('starLabel');
+        const commentsList = document.getElementById('commentsList');
+
+        onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'reviews'), (snap) => {
+            const reviews = [];
+            snap.forEach(doc => reviews.push(doc.data()));
+            
+            reviews.sort((a,b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
+            
+            commentsList.innerHTML = reviews.map(r => `
+                <div class="comment-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 800; color: var(--secondary); font-size: 0.9rem;">Anon#${r.user}</span>
+                        <span style="color: #ffcc00; font-size: 0.8rem;">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span>
+                    </div>
+                    <p style="font-size: 0.95rem; opacity: 0.9; line-height: 1.4;">${r.text}</p>
+                </div>
+            `).join('');
+
+            if(reviews.length > 0) {
+                const totalStars = reviews.reduce((acc, curr) => acc + curr.stars, 0);
+                const average = totalStars / reviews.length;
+                avgRatingText.innerText = average.toFixed(1);
+                const rounded = Math.round(average);
+                starLabel.innerText = '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+            } else {
+                avgRatingText.innerText = "0.0";
+                starLabel.innerText = '☆☆☆☆☆';
+            }
+        });
+
+        // Lógica de Cambio de Tema
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        themeBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeIcon.innerText = isDark ? 'light_mode' : 'dark_mode';
+        });
+
+        // Animación al hacer scroll
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(r => revealObserver.observe(r));
     </script>
 </body>
 </html>
